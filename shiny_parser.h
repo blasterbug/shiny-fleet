@@ -5,14 +5,12 @@
  ** Shiny fleet
  ** Lecture des données pour le projet
  **/
-#ifndef parcer
-#define parcer
+#ifndef parser
+#define parser
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glpk.h>
-
 
 typedef struct {
 	/* Nombre de lieux à visiter n */
@@ -30,24 +28,30 @@ void shiny_reader( char* filename, donnees *dat )
 	FILE *fichier;
 	/* indice */
 	int i;
-	/* entiers lus er convertis */
+	/* entiers lus et convertis */
 	int val, res;
-	
 	/* ouverture du fichier en lecture */
 	fichier = fopen( filename,"r" );
 	
 	/* lecture du nombre de lieux à visiter */
 	res = fscanf( fichier, "%d", &val );
+	//printf( "%d\n", res );
 	dat->n = val;
+	
+	/* allocation mémoire pour les données */
+	dat->d = (int*) malloc( dat->n * sizeof(int) );
 	
 	/* remplissage du tableau des distances */
 	for( i=0; i < dat->n*dat->n; i++ )
 	{
 		res = fscanf( fichier, "%d", &val );
 		dat->d[i] = val;
+		//printf("%d : %d\n", i, val);
 	}
 	
 	/* fermeture du fichier */
 	fclose( fichier );
 }
+
 #endif
+/** fin du fichier **/
