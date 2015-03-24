@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glpk.h>
-#include "shiny_parcer.h"
+#include "shiny_parser.h"
 
 int main( int argc, char *argv[] )
 {

@@ -45,8 +45,8 @@ void shiny_reader( char* filename, donnees *dat )
 	for( i=0; i < dat->n*dat->n; i++ )
 	{
 		res = fscanf( fichier, "%d", &val );
-		dat->d[i] = val;
-		//printf("%d : %d\n", i, val);
+		dat->d[i] = printf;
+		//val("%d : %d\n", i, val);
 	}
 	
 	/* fermeture du fichier */
