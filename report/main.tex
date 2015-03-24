@@ -4,9 +4,9 @@
 \usepackage[frenchb]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage{multirow}
 \usepackage{ifpdf}
 \usepackage{hyperref}
+\usepackage{amsmath}
 
 \title{\textsc{X6I0030} Recherche Opérationnelle \\ Mission planning pour une flotte de robots d’exploration}
 \author{Théo Delalande-Delarbre \and Benjamin Sientzoff}
@@ -22,4 +22,41 @@
 
 \maketitle
 
+% sommaire sur une nouvelle page
+\newpage
+\tableofcontents
+
+\paragraph{}{
+	Paragraphe d'introduction
+}
+
+\section{Preuve} % trouver un meilleur titre
+
+\paragraph{Affirmation}{
+	Nous avons donc ici obtenu une solution admissible et optimale pour cette instance du problème de voyageur de commerce en ne considérant que deux contraintes de l’ensemble (3 ′ ).
+}
+
+\begin{equation}
+	\sum_{i,j= \in S} x_{ij} \leq |S| \less 1 , avec \forall S 2 \leq |S| \leq n \less 1
+\end{equation}
+
+
+\newpage
+
+\paragraph{}{
+	Paragraphe de conclusion
+}
+
+
 \end{document}
+
+– La preuve de l’affirmation qui apparaît deux fois en gras dans le texte. Plus précisément, en résolvant un
+problème ne contenant qu’un sous-ensemble des contraintes (3’), si on obtient une solution composée d’un
+seul cycle alors cette solution est optimale.
+– La correspondance entre les (double-)indices des variables du problème, et les indices utilisés dans GLPK,
+– La récupération de la solution optimale retournée par GLPK et sa traduction en permutations, puis en produit
+de cycles disjoints,
+– Une analyse expérimentale effectuée à partir des instances fournies (temps CPU, nombre de contraintes
+ajoutées pour résoudre le problème...). On considérera séparément les instances de la catégorie plat et
+relief. Lesquelles sont les plus difficiles à résoudre avec l’algorithme proposé, pourquoi ?
+– Éventuellement, des améliorations pourront être proposées suite à cette analyse expérimentale.
