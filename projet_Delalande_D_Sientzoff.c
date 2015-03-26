@@ -12,11 +12,14 @@
 
 int main( int argc, char *argv[] )
 {
+	if(argc < 2){
+		perror("Nombre d'arguments incorrect\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	/*Initialisation des données du problème*/
 	donnees donprob;
 	shiny_reader( argv[1], &donprob);
-	
-	
 	
 	/*Nombre de variables x_ij (var binaire : passage de i à j)*/
 	int nbvar;
@@ -38,11 +41,11 @@ int main( int argc, char *argv[] )
 	
 	/*Indices de boucles utilisés ici et là*/
 	int i,j=0;
+	int pos;
 
 	nbvar = donprob.n*donprob.n;
 	nbcont = 2*donprob.n;
 	nbcreux = 2*donprob.n*donprob.n;
-
 
 	prob = glp_create_prob(); /*Allocation mémoire pour le problème*/
 	glp_set_prob_name(prob, "trajet"); /* affectation d'un nom */
@@ -72,7 +75,7 @@ int main( int argc, char *argv[] )
 	
 	/* définition des coefficients des variables dans la fonction objectif */
 	/*Buggue certainement*/
-	for (i=1; i<=nbvar; i++) glp_set_obj_coef(prob,i,donprob.d[i]);
+	for (i=1; i<=nbvar; i++) glp_set_obj_coef(prob,i,donprob.d[i-1]);
 
 	/* allocation */
 	ia = (int *) malloc ((1 + nbcreux) * sizeof(int));
@@ -80,12 +83,12 @@ int main( int argc, char *argv[] )
 	ar = (double *) malloc ((1 + nbcreux) * sizeof(double));
 
 	/*remplissage matrice contrainte*/
-	int pos = 1;
+	pos = 1;
 	/*Contraintes (1)*/
 	for(i=1; i<=donprob.n; i++){
-		for (j=0; j<donprob.n; j++){
+		for (j=1; j<=donprob.n; j++){
 			ia[pos] = i;
-			ja[pos] = i+donprob.n;
+			ja[pos] = j+(i-1)*donprob.n;
 			ar[pos] = 1.0;
 			pos++;
 		}
@@ -93,9 +96,9 @@ int main( int argc, char *argv[] )
 	
 	/*Contraintes (2)*/
 	for(i=1; i<=donprob.n; i++){
-		for (j=0; j<donprob.n; j++){
+		for (j=1; j<=donprob.n; j++){
 			ia[pos] = i+donprob.n;
-			ja[pos] = i+j*donprob.n;
+			ja[pos] = i+(j-1)*donprob.n;
 			ar[pos] = 1.0;
 			pos++;
 		}
