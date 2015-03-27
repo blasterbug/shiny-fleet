@@ -39,7 +39,7 @@ void shiny_reader( char* filename, donnees *dat )
 	dat->n = val;
 	
 	/* allocation mémoire pour les données */
-	dat->d = (int*) malloc( dat->n * sizeof(int) );
+	dat->d = (int*) malloc( dat->n * dat->n * sizeof(int) );
 	
 	/* remplissage du tableau des distances */
 	for( i=0; i < dat->n*dat->n; i++ )
