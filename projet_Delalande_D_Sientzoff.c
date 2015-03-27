@@ -120,8 +120,7 @@ int main( int argc, char *argv[] )
 	glp_load_matrix(prob,nbcreux,ia,ja,ar); 
 	
 	/* écriture de la modélisation dans un fichier*/
-	///ERREUR ICI
-	//glp_write_lp(prob,NULL,"trajet.lp");
+	glp_write_lp(prob,NULL,"trajet.lp");
 
 	/* Résolution, puis lecture des résultats */
 	glp_simplex(prob,NULL);
@@ -141,8 +140,20 @@ int main( int argc, char *argv[] )
 		puts("");
 	}
 	
+	/*
+	while(longueur du plus_petit_cycle < n)
+	{
+		//realloc
+		//ajout contraintes
+		//repeter la resolution
+		//recalcul pluspetitcycle
+	}
+	*/
 
 	/* libération mémoire */
+	
+	
+	
 	glp_delete_prob(prob);
 	free(ia);
 	free(ja);
@@ -150,5 +161,70 @@ int main( int argc, char *argv[] )
 	free(x);
 
 	return 0;
+}
+
+/**
+** Trouve le plus petit cycle des variables et sa longueur
+**	valeursvar : le tableau des variables qu'on considère cohérent par rapport à nos contraintes
+**	nbdest : le nombre de destinations dans notre problème
+**/
+void plus_petit_cycle(int * valeursvar, int nbdest){
+	int * boucle_courante = (int *) malloc ((nbdest) * sizeof(int));
+	int boucle_courante_long = 0;
+	int * boucle_min = (int *) malloc ((nbdest) * sizeof(int));
+	int boucle_min_long = nbdest;
+	
+	int i,j,dest_suiv;
+	int * desti_visitees = (int *) malloc ((nbdest) * sizeof(int));
+	
+	//initialisation des destinations a vérifier et des tableaux de boucle
+	for (i=0; i< nbdest; i++){
+		desti_visitees[i] = i;
+		boucle_courante[i] = 0;
+		boucle_min[i] = 0;
+	}
+	
+	for (i=0; i< nbdest; i++){ //pour chaque destination
+		//Si la destination n'est pas deja incluse dans une boucle visitee auparavant
+		if (!desti_visitees[i]==0){
+			//Cree un nouveau cycle
+			desti_visitees[i]=0;
+			
+			do{
+				boucle_courante[boucle_courante_long]=i;
+				boucle_courante_long++;
+				//On fouille la ligne pour trouver la dest suivante
+				j=nbdest*i;
+				
+				while (!valeursvar[j]==1){ //tant qu'on n'a pas trouvé une valeur 1 sur la ligne
+					j++;
+				}
+				dest_suiv = j % nbdest;
+				
+			} while (!dest_suiv==boucle_courante[0]);
+			//Recommence tant qu'on n'est pas revenu au début de notre boucle
+			
+			//Si on a trouvé un cycle plus petit
+			if (boucle_courante_long<boucle_min_long){
+				for (j=0; j< nbdest; j++){
+					//enregistre le nouveau + petit cycle
+					boucle_min[j] = boucle_courante[j];
+				}
+			}
+			
+			//Affichage du cycle détecté pour débug
+			for (j=0; j< boucle_courante_long; j++){
+				printf("%d,",boucle_courante[j]);
+			}
+			puts(" ");
+			
+			
+			for (j=0; j< boucle_courante_long; j++){
+				//nettoie boucle_courante
+				boucle_courante[j] = 0;
+			}
+			boucle_courante_long=0;
+		}
+	}
 }
 
