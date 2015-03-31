@@ -12,66 +12,75 @@
 #include "shiny_parser.h"
 
 /**
-** Trouve le plus petit cycle des variables et sa longueur
-**	valeursvar : le tableau des variables qu'on considère cohérent par rapport à nos contraintes
-**	nbdest : le nombre de destinations dans notre problème
-**/
-int plus_petit_cycle(int * valeursvar, int nbdest){
-	int * boucle_courante = (int *) malloc ((nbdest) * sizeof(int));
+ * Trouve le plus petit cycle après résolution
+ *	@param[in] valeursvar tableau des variables après résolution
+ *	@param[in] nbdest nombre de destinations dans le problème
+ *	@param[out] boucle_min tableau avec les cycles
+ * 	@param[out] n Taille du plus petit cycle trouvé
+ */
+int plus_petit_cycle( const int* valeursvar, const int nbdest, int* boucle_min )
+{
+	int* boucle_courante = (int*) malloc((nbdest) * sizeof(int));
 	int boucle_courante_long = 0;
-	int * boucle_min = (int *) malloc ((nbdest) * sizeof(int));
+	//boucle_min = (int*) malloc((nbdest) * sizeof(int)); // Bug ?! WTF!
 	int boucle_min_long = nbdest;
-	bool * desti_visit = (bool *) malloc ((nbdest) * sizeof(bool));
+	bool* desti_visit = (bool*) malloc((nbdest) * sizeof(bool));
 	
 	int i, j, suiv;
-	int * desti_succ = (int *) malloc ((nbdest) * sizeof(int));
+	int * desti_succ = (int *) malloc((nbdest) * sizeof(int));
 	
-	//initialisation des destinations a vérifier et des tableaux de boucle
+	// initialisation des destinations à vérifier et des tableaux
 	for (i=0; i< nbdest; i++){
 		boucle_courante[i] = 0;
 		boucle_min[i] = 0;
 		desti_visit[i]=false;
 	}
 	
-	//Récolte le successeur de chaque destination
+	// Récolte le successeur de chaque destination
 	for (i=0; i< nbdest; i++){
 		j=nbdest*i;
-		while (!valeursvar[j]==1.){ //On cherche la valeur 1 sur la "ligne"
+		//On cherche la valeur 1 sur la "ligne"
+		while (valeursvar[j]!=1.)
+		{ 
 			j++;
 		}
-		desti_succ[i]=j % nbdest;
+		desti_succ[i] = j % nbdest;
 	}
 	
-	//Affichage des successeurs pour debug
-	//for (i=0; i<nbdest; i++){printf("%d->%d\n",i,desti_succ[i]);}
-	
+	// Affichage des successeurs pour debug
+	// for(i=0; i<nbdest; i++) printf("%d->%d\n",i,desti_succ[i]); 
+
+	// recherche des cycles
+	// chaque sommet
 	for (i=0; i<nbdest; i++){
+		// éliminer les sommets déjà visités
 		if(!desti_visit[i]){
 			suiv = i;
+			// pour chaque somet visité
+			// on en visite au moins un
 			do{
-				desti_visit[suiv]=true;
-				boucle_courante[boucle_courante_long]=suiv;
+				desti_visit[ suiv ] = true;
+				// TODO: modulo taille du tableau
+				boucle_courante[ boucle_courante_long ] = suiv;
 				boucle_courante_long++;
-				suiv=desti_succ[suiv];
-			} while (suiv!=i);
+				suiv = desti_succ[ suiv ];
+			} while (suiv != i);
 			
-			//Affichage du cycle détecté pour debug
-			/*
-			for (j=0; j< boucle_courante_long; j++){
-				printf("%d,",boucle_courante[j]);
-			}
-			puts(" ");
-			*/
+			// Affichage du cycle détecté pour debug
+			// for (j=0; j< boucle_courante_long; j++) printf("%d,",boucle_courante[j]);
+			// puts(" ");
 			
-			//Si le cycle détecté est plus petit que l'ancien plus petit, on le conserve
+			// Si le cycle détecté est plus petit que l'ancien cycle
 			if (boucle_courante_long<boucle_min_long){
-				for (j=0; j< boucle_min_long; j++){
+				// alors on le conserve
+				for (j=0; j< nbdest	; j++){
 					boucle_min[j] = boucle_courante[j];
 				}
+				// MàJ taille du cycle
 				boucle_min_long = boucle_courante_long;
 			}
 			
-			//Nettoie boucle_courante
+			// Nettoie boucle_courante
 			for (j=0; j< boucle_courante_long; j++){
 				boucle_courante[j] = 0;
 			}
@@ -79,24 +88,20 @@ int plus_petit_cycle(int * valeursvar, int nbdest){
 		}
 	}
 	
-	//Affichage du plus petit cycle détecté pour debug
+	// Affichage du plus petit cycle détecté pour debug
+	/// printf("Plus petit cycle détecté :");
+	/// for (j=0; j< boucle_min_long; j++) printf("%d, ", boucle_min[j]);
+	/// puts(" ");
 	
-	printf("Plus petit cycle détecté :");
-	for (j=0; j< boucle_min_long; j++){
-		printf("%d, ",boucle_min[j]);
-	}
-	puts(" ");
-	
-	
+	// libération de la mémoire
 	free(boucle_courante);
-	free(boucle_min);
 	free(desti_visit);
 	free(desti_succ);
 	
 	return boucle_min_long;
 }
 
-int main( int argc, char *argv[] )
+int main( int argc, char **argv )
 {
 	if(argc < 2){
 		perror("Nombre d'arguments incorrect\n");
@@ -119,9 +124,9 @@ int main( int argc, char *argv[] )
 	double *ar;
 	
 	/*Resultats*/
-	double z; //Res fonction objectif
-	double *x; //Variables
-	int *xcast; //Variables castées en entiers (pour le traitement)
+	double z; // Res fonction objectif
+	double *x; // Variables
+	int *xcast; // Variables castées en entiers (pour le traitement)
 
 	/*Nombre de coeff non-nuls dans la matrice de contraintes*/
 	int nbcreux;
@@ -130,7 +135,7 @@ int main( int argc, char *argv[] )
 	int i,j=0;
 	int pos;
 	
-	int *tab_cycle; //Tableau contenant le cycle à casser 
+	int *tab_cycle; // Tableau contenant le sous-cycle à casser 
 
 	nbvar = donprob.n*donprob.n;
 	nbcont = 2*donprob.n;
@@ -167,7 +172,7 @@ int main( int argc, char *argv[] )
 	{
 		/* bornes éventuelles sur les variables, et type */
 		glp_set_col_bnds(prob, i, GLP_DB, 0.0, 1.0); 
-		/* bornes sur les variables, comme sur les contraintes */
+		/* bornes sur les variables, ///me sur les contraintes */
 		glp_set_col_kind(prob, i, GLP_BV);
 	} 
 	
@@ -175,9 +180,9 @@ int main( int argc, char *argv[] )
 	for (i=1; i<=nbvar; i++) glp_set_obj_coef(prob,i,donprob.d[i-1]);
 
 	/* allocation */
-	ia = (int *) malloc ((1 + nbcreux) * sizeof(int));
-	ja = (int *) malloc ((1 + nbcreux) * sizeof(int));
-	ar = (double *) malloc ((1 + nbcreux) * sizeof(double));
+	ia = (int *) malloc((1 + nbcreux) * sizeof(int));
+	ja = (int *) malloc((1 + nbcreux) * sizeof(int));
+	ar = (double *) malloc((1 + nbcreux) * sizeof(double));
 
 	/*remplissage matrice contrainte*/
 	pos = 1;
@@ -218,60 +223,60 @@ int main( int argc, char *argv[] )
 	z = glp_mip_obj_val(prob); /* Récupération de la valeur optimale.*/
 	
 	/* Récupération des valeurs de variables */
-	x = (double *) malloc (nbvar * sizeof(double));
+	x = (double *) malloc(nbvar * sizeof(double));
 	for(i = 0;i < nbvar; i++) x[i] = glp_mip_col_val(prob,i+1); 
 
-	printf("z = %lf\n",z);
+	/// printf("z = %lf\n",z);
 	
-	xcast = (int *) malloc (nbvar * sizeof(int));
+	xcast = (int *) malloc(nbvar * sizeof(int));
 	int xnew;
 	for(i = 0;i < donprob.n;i++){
 		for(j = 0;j < donprob.n;j++){
 		xnew=(int)(x[i*donprob.n+j] + 0.5);
-		printf("x%d_%d = %d, ",i,j,xnew); /* un cast est ajouté, x[i] pourrait être égal à 0.99999... */
+		/* un cast est ajouté, x[i] pourrait être égal à 0.99999... */
+		/// printf("x%d_%d = %d, ",i,j,xnew);
 		xcast[i*donprob.n+j]=xnew;
 		}
-		puts("");
+		/// puts("");
 	}
-
-	int long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n);
-	printf("Cycle de taille %d\n",long_plus_petit_cycle);
-	tab_cycle = (int *) malloc (donprob.n * sizeof(int));
-	tab_cycle[0]=1;
-	tab_cycle[1]=5;
-	//Récupérer le cycle dans tab_cycle
 	
-	//while(long_plus_petit_cycle < donprob.n)
-	//{
+	tab_cycle = (int *) calloc( sizeof(int), donprob.n * sizeof(int)); // Allocation dans fonction
+
+	// Récupérer le cycle dans tab_cycle
+	int long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle);
+	/// printf("Cycle de taille %d\n",long_plus_petit_cycle);
+	
+	while(long_plus_petit_cycle < donprob.n)
+	{
 		nbcont++; 
 		nbcreux += long_plus_petit_cycle;
 		
 		
 		
-		//****ajout contraintes
+		// ****ajout contraintes
 		
-		/*Ajout d'une ligne de contrainte*/
+		/* Ajout d'une ligne de contrainte */
 		glp_add_rows(prob, 1); 
 
 
 		/* Bornes sur la nouvelle contrainte pour casser le cycle */
 		glp_set_row_bnds(prob, nbcont, GLP_UP, long_plus_petit_cycle-1.0, long_plus_petit_cycle-1.0); 
 		
-		//****realloc
+		// ****realloc
 		/* allocation */
 		printf("Nouveau nbcreux : %d\n",nbcreux);
 		ia = (int *) realloc(ia, (100 + nbcreux)* sizeof(int));
 		ja = (int *) realloc(ja, (100 + nbcreux)* sizeof(int));
 		ar = (double *) realloc(ar, (100 + nbcreux)* sizeof(double));
 			
-		/*Remplissage matrice contrainte*/
-		/*Transition fin/début du cycle*/
+		/* Remplissage matrice contrainte */
+		/* Transition fin/début du cycle */
 		ia[pos] = nbcont;
 		ja[pos] = ((tab_cycle[long_plus_petit_cycle-1])*donprob.n)+tab_cycle[0]+1;
 		ar[pos] = 1.0;
 		pos++;
 			
-		/*Autres transitions*/
+		/* Autres transitions */
 		for(i=0;i<long_plus_petit_cycle-1;i++){
 			ia[pos] = nbcont;
 			ja[pos] = (tab_cycle[i]*donprob.n)+tab_cycle[i+1]+1;
@@ -279,14 +284,13 @@ int main( int argc, char *argv[] )
 			pos++;
 		}
 		
-		
-		//****repeter la resolution
-		/*A mettre dans une fonction*/
+		// ****repeter la resolution
+		/* A mettre dans une fonction */
 			
-		/*Check matrice de contrainte*/
+		/* Check matrice de contrainte */
 		for(i=1; i<=nbcreux; i++)
 		{
-			printf("ia[%d] = %d; ja[%d] = %d; ar[%d] = %f;\n", i, ia[i], i, ja[i], i, ar[i]);
+			/// printf("ia[%d] = %d; ja[%d] = %d; ar[%d] = %f;\n", i, ia[i], i, ja[i], i, ar[i]);
 		}
 		/* chargement de la matrice dans le problème */
 		glp_load_matrix(prob,nbcreux,ia,ja,ar); 
@@ -301,39 +305,50 @@ int main( int argc, char *argv[] )
 		z = glp_mip_obj_val(prob); /* Récupération de la valeur optimale.*/
 	
 		/* Récupération des valeurs de variables */
-		x = (double *) malloc (nbvar * sizeof(double));
+		x = (double *) malloc(nbvar * sizeof(double));
 		for(i = 0;i < nbvar; i++) x[i] = glp_mip_col_val(prob,i+1); 
 
 		printf("z = %lf\n",z);
 	
-		xcast = (int *) malloc (nbvar * sizeof(int));
+		xcast = (int *) malloc(nbvar * sizeof(int));
 
 		for(i = 0;i < donprob.n;i++){
 			for(j = 0;j < donprob.n;j++){
 			xnew=(int)(x[i*donprob.n+j] + 0.5);
-			printf("x%d_%d = %d, ",i,j,xnew); /* un cast est ajouté, x[i] pourrait être égal à 0.99999... */
+			/* un cast est ajouté, x[i] pourrait être égal à 0.99999... */
+			/// printf("x%d_%d = %d, ",i,j,xnew);
 			xcast[i*donprob.n+j]=xnew;
 			}
-			puts("");
+			/// puts("");
 		}
 		
-		
-		//recalcul pluspetitcycle
-		long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n);
-	//}
-	
+		// recalcul pluspetitcycle
+		long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle );
+	}
+
+	// Affichage de la solution
+	printf( "itinéraire calculé :\n" );
+	int xi = 0 ;
+	int depart, destination;
+	destination = 0;
+	for (xi = 0 ; xi < donprob.n ; xi++ )
+	{
+		depart = destination;
+		//On cherche la valeur 1 sur la "ligne"
+		while( xcast[ depart ] != 1 ) depart++;
+		printf( "	%d -> %d\n", depart, destination );
+		depart = xi * donprob.n;
+	}
 
 	/* libération mémoire */
-	
-	
-	
 	glp_delete_prob(prob);
 	free(ia);
 	free(ja);
 	free(ar);
 	free(x);
 	free(xcast);
+	free(tab_cycle);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
