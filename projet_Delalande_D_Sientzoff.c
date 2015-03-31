@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <glpk.h>
 #include "shiny_parser.h"
+#include "sous_cycles.h"
 
 /* Déclarations pour le compteur de temps CPU */
 #include <time.h>
@@ -41,96 +42,6 @@ double crono_ms()
     (stop_utime.tv_usec - start_utime.tv_usec) / 1000 ;
 }
 
-
-/**
- * Trouve le plus petit cycle après résolution
- *	@param[in] valeursvar tableau des variables après résolution
- *	@param[in] nbdest nombre de destinations dans le problème
- *	@param[out] boucle_min tableau avec les cycles
- * 	@param[out] n Taille du plus petit cycle trouvé
- */
-int plus_petit_cycle( const int* valeursvar, const int nbdest, int* boucle_min )
-{
-	int* boucle_courante = (int*) malloc((nbdest) * sizeof(int));
-	int boucle_courante_long = 0;
-	//boucle_min = (int*) malloc((nbdest) * sizeof(int)); // Bug ?! WTF!
-	int boucle_min_long = nbdest;
-	bool* desti_visit = (bool*) malloc((nbdest) * sizeof(bool));
-	
-	int i, j, suiv;
-	int * desti_succ = (int *) malloc((nbdest) * sizeof(int));
-	
-	// initialisation des destinations à vérifier et des tableaux
-	for (i=0; i< nbdest; i++){
-		boucle_courante[i] = 0;
-		boucle_min[i] = 0;
-		desti_visit[i]=false;
-	}
-	
-	// Récolte le successeur de chaque destination
-	for (i=0; i< nbdest; i++){
-		j=nbdest*i;
-		//On cherche la valeur 1 sur la "ligne"
-		while (valeursvar[j]!=1.)
-		{ 
-			j++;
-		}
-		desti_succ[i] = j % nbdest;
-	}
-	
-	// Affichage des successeurs pour debug
-	// for(i=0; i<nbdest; i++) printf("%d->%d\n",i,desti_succ[i]); 
-
-	// recherche des cycles
-	// chaque sommet
-	for (i=0; i<nbdest; i++){
-		// éliminer les sommets déjà visités
-		if(!desti_visit[i]){
-			suiv = i;
-			// pour chaque somet visité
-			// on en visite au moins un
-			do{
-				desti_visit[ suiv ] = true;
-				// TODO: modulo taille du tableau
-				boucle_courante[ boucle_courante_long ] = suiv;
-				boucle_courante_long++;
-				suiv = desti_succ[ suiv ];
-			} while (suiv != i);
-			
-			// Affichage du cycle détecté pour debug
-			// for (j=0; j< boucle_courante_long; j++) printf("%d,",boucle_courante[j]);
-			// puts(" ");
-			
-			// Si le cycle détecté est plus petit que l'ancien cycle
-			if (boucle_courante_long<boucle_min_long){
-				// alors on le conserve
-				for (j=0; j< nbdest	; j++){
-					boucle_min[j] = boucle_courante[j];
-				}
-				// MàJ taille du cycle
-				boucle_min_long = boucle_courante_long;
-			}
-			
-			// Nettoie boucle_courante
-			for (j=0; j< boucle_courante_long; j++){
-				boucle_courante[j] = 0;
-			}
-			boucle_courante_long=0;
-		}
-	}
-	
-	// Affichage du plus petit cycle détecté pour debug
-	/// printf("Plus petit cycle détecté :");
-	/// for (j=0; j< boucle_min_long; j++) printf("%d, ", boucle_min[j]);
-	/// puts(" ");
-	
-	// libération de la mémoire
-	free(boucle_courante);
-	free(desti_visit);
-	free(desti_succ);
-	
-	return boucle_min_long;
-}
 
 int main( int argc, char **argv )
 {
@@ -286,24 +197,22 @@ int main( int argc, char **argv )
 	tab_cycle = (int *) calloc( sizeof(int), donprob.n * sizeof(int)); // Allocation dans fonction
 
 	// Récupérer le cycle dans tab_cycle
-	int long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle);
-	/// printf("Cycle de taille %d\n",long_plus_petit_cycle);
+	int long_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle);
+	/// printf("Cycle de taille %d\n",long_cycle);
 	
-	while(long_plus_petit_cycle < donprob.n)
+	while(long_cycle < donprob.n)
 	{
-		nbcontr++; 
-		nbcreux += long_plus_petit_cycle;
 		
-		
+		nbcreux += long_cycle;		
 		
 		// ****ajout contraintes
 		
 		/* Ajout d'une ligne de contrainte */
 		glp_add_rows(prob, 1); 
-
+		nbcontr++; 
 
 		/* Bornes sur la nouvelle contrainte pour casser le cycle */
-		glp_set_row_bnds(prob, nbcontr, GLP_UP, long_plus_petit_cycle-1.0, long_plus_petit_cycle-1.0); 
+		glp_set_row_bnds(prob, nbcontr, GLP_UP, long_cycle-1.0, long_cycle-1.0); 
 		
 		// ****realloc
 		/* allocation */
@@ -315,12 +224,12 @@ int main( int argc, char **argv )
 		/* Remplissage matrice contrainte */
 		/* Transition fin/début du cycle */
 		ia[pos] = nbcontr;
-		ja[pos] = ((tab_cycle[long_plus_petit_cycle-1])*donprob.n)+tab_cycle[0]+1;
+		ja[pos] = ((tab_cycle[long_cycle-1])*donprob.n)+tab_cycle[0]+1;
 		ar[pos] = 1.0;
 		pos++;
 			
 		/* Autres transitions */
-		for(i=0;i<long_plus_petit_cycle-1;i++){
+		for(i=0;i<long_cycle-1;i++){
 			ia[pos] = nbcontr;
 			ja[pos] = (tab_cycle[i]*donprob.n)+tab_cycle[i+1]+1;
 			ar[pos] = 1.0;
@@ -367,7 +276,7 @@ int main( int argc, char **argv )
 		}
 		
 		// recalcul pluspetitcycle
-		long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle );
+		long_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle );
 	}
 	
 	/* Résolution achevée, arrêt du compteur de temps et affichage des résultats */
