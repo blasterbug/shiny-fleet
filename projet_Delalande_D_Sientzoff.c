@@ -16,7 +16,7 @@
 **	valeursvar : le tableau des variables qu'on considère cohérent par rapport à nos contraintes
 **	nbdest : le nombre de destinations dans notre problème
 **/
-void plus_petit_cycle(int * valeursvar, int nbdest){
+int plus_petit_cycle(int * valeursvar, int nbdest){
 	int * boucle_courante = (int *) malloc ((nbdest) * sizeof(int));
 	int boucle_courante_long = 0;
 	int * boucle_min = (int *) malloc ((nbdest) * sizeof(int));
@@ -80,19 +80,20 @@ void plus_petit_cycle(int * valeursvar, int nbdest){
 	}
 	
 	//Affichage du plus petit cycle détecté pour debug
-	/*
+	
 	printf("Plus petit cycle détecté :");
 	for (j=0; j< boucle_min_long; j++){
-		printf("%d",boucle_min[j]);
+		printf("%d, ",boucle_min[j]);
 	}
 	puts(" ");
-	*/
+	
 	
 	free(boucle_courante);
 	free(boucle_min);
 	free(desti_visit);
 	free(desti_succ);
 	
+	return boucle_min_long;
 }
 
 int main( int argc, char *argv[] )
@@ -128,6 +129,8 @@ int main( int argc, char *argv[] )
 	/*Indices de boucles utilisés ici et là*/
 	int i,j=0;
 	int pos;
+	
+	int *tab_cycle; //Tableau contenant le cycle à casser 
 
 	nbvar = donprob.n*donprob.n;
 	nbcont = 2*donprob.n;
@@ -197,7 +200,7 @@ int main( int argc, char *argv[] )
 	
 	/*Check matrice de contrainte*/
 	/*
-	for(i=1; i<pos; i++)
+	for(i=1; i<=nbcreux; i++)
 	{
 		printf("ia[%d] = %d; ja[%d] = %d; ar[%d] = %f;\n", i, ia[i], i, ja[i], i, ar[i]);
 	}*/
@@ -231,17 +234,94 @@ int main( int argc, char *argv[] )
 		puts("");
 	}
 
-	plus_petit_cycle(xcast, donprob.n);
+	int long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n);
+	printf("Cycle de taille %d\n",long_plus_petit_cycle);
+	tab_cycle = (int *) malloc (donprob.n * sizeof(int));
+	tab_cycle[0]=1;
+	tab_cycle[1]=5;
+	//Récupérer le cycle dans tab_cycle
 	
-	/*
-	while(longueur du plus_petit_cycle < n)
-	{
-		//realloc
-		//ajout contraintes
-		//repeter la resolution
+	//while(long_plus_petit_cycle < donprob.n)
+	//{
+		nbcont++; 
+		nbcreux += long_plus_petit_cycle;
+		
+		
+		
+		//****ajout contraintes
+		
+		/*Ajout d'une ligne de contrainte*/
+		glp_add_rows(prob, 1); 
+
+
+		/* Bornes sur la nouvelle contrainte pour casser le cycle */
+		glp_set_row_bnds(prob, nbcont, GLP_UP, long_plus_petit_cycle-1.0, long_plus_petit_cycle-1.0); 
+		
+		//****realloc
+		/* allocation */
+		printf("Nouveau nbcreux : %d\n",nbcreux);
+		ia = (int *) realloc(ia, (100 + nbcreux)* sizeof(int));
+		ja = (int *) realloc(ja, (100 + nbcreux)* sizeof(int));
+		ar = (double *) realloc(ar, (100 + nbcreux)* sizeof(double));
+			
+		/*Remplissage matrice contrainte*/
+		/*Transition fin/début du cycle*/
+		ia[pos] = nbcont;
+		ja[pos] = ((tab_cycle[long_plus_petit_cycle-1])*donprob.n)+tab_cycle[0]+1;
+		ar[pos] = 1.0;
+		pos++;
+			
+		/*Autres transitions*/
+		for(i=0;i<long_plus_petit_cycle-1;i++){
+			ia[pos] = nbcont;
+			ja[pos] = (tab_cycle[i]*donprob.n)+tab_cycle[i+1]+1;
+			ar[pos] = 1.0;
+			pos++;
+		}
+		
+		
+		//****repeter la resolution
+		/*A mettre dans une fonction*/
+			
+		/*Check matrice de contrainte*/
+		for(i=1; i<=nbcreux; i++)
+		{
+			printf("ia[%d] = %d; ja[%d] = %d; ar[%d] = %f;\n", i, ia[i], i, ja[i], i, ar[i]);
+		}
+		/* chargement de la matrice dans le problème */
+		glp_load_matrix(prob,nbcreux,ia,ja,ar); 
+	
+		/* écriture de la modélisation dans un fichier*/
+		glp_write_lp(prob,NULL,"trajet.lp");
+
+		/* Résolution, puis lecture des résultats */
+		glp_simplex(prob,NULL);
+		glp_intopt(prob,NULL); /* Résolution */
+	
+		z = glp_mip_obj_val(prob); /* Récupération de la valeur optimale.*/
+	
+		/* Récupération des valeurs de variables */
+		x = (double *) malloc (nbvar * sizeof(double));
+		for(i = 0;i < nbvar; i++) x[i] = glp_mip_col_val(prob,i+1); 
+
+		printf("z = %lf\n",z);
+	
+		xcast = (int *) malloc (nbvar * sizeof(int));
+
+		for(i = 0;i < donprob.n;i++){
+			for(j = 0;j < donprob.n;j++){
+			xnew=(int)(x[i*donprob.n+j] + 0.5);
+			printf("x%d_%d = %d, ",i,j,xnew); /* un cast est ajouté, x[i] pourrait être égal à 0.99999... */
+			xcast[i*donprob.n+j]=xnew;
+			}
+			puts("");
+		}
+		
+		
 		//recalcul pluspetitcycle
-	}
-	*/
+		long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n);
+	//}
+	
 
 	/* libération mémoire */
 	
