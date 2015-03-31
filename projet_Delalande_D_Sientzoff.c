@@ -214,11 +214,11 @@ int main( int argc, char **argv )
 	glp_load_matrix(prob,nbcreux,ia,ja,ar); 
 	
 	/* écriture de la modélisation dans un fichier*/
-	glp_write_lp(prob,NULL,"trajet.lp");
+	///glp_write_lp(prob,NULL,"trajet.lp");
 
 	/* Résolution, puis lecture des résultats */
-	glp_simplex(prob,NULL);
-	glp_intopt(prob,NULL); /* Résolution */
+	glp_simplex(prob,&parm);
+	glp_intopt(prob,&parmip); /* Résolution */
 	
 	z = glp_mip_obj_val(prob); /* Récupération de la valeur optimale.*/
 	
@@ -264,7 +264,7 @@ int main( int argc, char **argv )
 		
 		// ****realloc
 		/* allocation */
-		printf("Nouveau nbcreux : %d\n",nbcreux);
+		///printf("Nouveau nbcreux : %d\n",nbcreux);
 		ia = (int *) realloc(ia, (100 + nbcreux)* sizeof(int));
 		ja = (int *) realloc(ja, (100 + nbcreux)* sizeof(int));
 		ar = (double *) realloc(ar, (100 + nbcreux)* sizeof(double));
@@ -296,11 +296,11 @@ int main( int argc, char **argv )
 		glp_load_matrix(prob,nbcreux,ia,ja,ar); 
 	
 		/* écriture de la modélisation dans un fichier*/
-		glp_write_lp(prob,NULL,"trajet.lp");
+		///glp_write_lp(prob,NULL,"trajet.lp");
 
 		/* Résolution, puis lecture des résultats */
-		glp_simplex(prob,NULL);
-		glp_intopt(prob,NULL); /* Résolution */
+		glp_simplex(prob,&parm);
+		glp_intopt(prob,&parmip); /* Résolution */
 	
 		z = glp_mip_obj_val(prob); /* Récupération de la valeur optimale.*/
 	
@@ -308,7 +308,7 @@ int main( int argc, char **argv )
 		x = (double *) malloc(nbvar * sizeof(double));
 		for(i = 0;i < nbvar; i++) x[i] = glp_mip_col_val(prob,i+1); 
 
-		printf("z = %lf\n",z);
+		/// printf("z = %lf\n",z);
 	
 		xcast = (int *) malloc(nbvar * sizeof(int));
 
@@ -327,6 +327,8 @@ int main( int argc, char **argv )
 	}
 
 	// Affichage de la solution
+	printf("z = %lf\n",z);
+	
 	printf( "\n Itinéraire calculé :\n" );
 	int xi = 0 ;
 	int depart, destination;
