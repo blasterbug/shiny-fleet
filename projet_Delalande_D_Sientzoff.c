@@ -327,18 +327,19 @@ int main( int argc, char **argv )
 	}
 
 	// Affichage de la solution
-	printf( "itinéraire calculé :\n" );
+	printf( "\n Itinéraire calculé :\n" );
 	int xi = 0 ;
 	int depart, destination;
-	destination = 0;
+	depart=0;
 	for (xi = 0 ; xi < donprob.n ; xi++ )
 	{
-		depart = destination;
+		destination = depart;
 		//On cherche la valeur 1 sur la "ligne"
-		while( xcast[ depart ] != 1 ) depart++;
-		printf( "	%d -> %d\n", depart, destination );
-		depart = xi * donprob.n;
+		while( xcast[ destination ] != 1 ) destination++;
+		printf( "%d -> ", depart/donprob.n);
+		depart = (destination % donprob.n) * donprob.n;
 	}
+	puts(" ");
 
 	/* libération mémoire */
 	glp_delete_prob(prob);
