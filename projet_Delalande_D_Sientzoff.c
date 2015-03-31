@@ -11,6 +11,37 @@
 #include <glpk.h>
 #include "shiny_parser.h"
 
+/* Déclarations pour le compteur de temps CPU */
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
+struct timeval start_utime, stop_utime;
+
+void crono_start()
+{
+	struct rusage rusage;
+	
+	getrusage(RUSAGE_SELF, &rusage);
+	start_utime = rusage.ru_utime;
+}
+
+void crono_stop()
+{
+	struct rusage rusage;
+	
+	getrusage(RUSAGE_SELF, &rusage);
+	stop_utime = rusage.ru_utime;
+}
+
+double crono_ms()
+{
+	return (stop_utime.tv_sec - start_utime.tv_sec) * 1000 +
+    (stop_utime.tv_usec - start_utime.tv_usec) / 1000 ;
+}
+
+
 /**
  * Trouve le plus petit cycle après résolution
  *	@param[in] valeursvar tableau des variables après résolution
@@ -110,12 +141,12 @@ int main( int argc, char **argv )
 	
 	/*Initialisation des données du problème*/
 	donnees donprob;
-	shiny_reader( argv[1], &donprob);
+	
 	
 	/*Nombre de variables x_ij (var binaire : passage de i à j)*/
 	int nbvar;
-	/*Nombre de contraintes de base (seulement (1) et (2))*/
-	int nbcont;
+	/*Nombre de contraintes ajoutées pour obtenir une solution composée d'un unique cycle*/
+	int nbcontr;
 
 	/*Initialisation des données et de la matrice creuse pour GLPK */
 	glp_prob *prob;
@@ -135,12 +166,21 @@ int main( int argc, char **argv )
 	int i,j=0;
 	int pos;
 	
-	int *tab_cycle; // Tableau contenant le sous-cycle à casser 
+	/* Tableau contenant le sous-cycle à casser */
+	int *tab_cycle; 
+	
+	double temps;
+	int nbsol = 0; /* Compteur du nombre d'appels au solveur GLPK */ 
+	
+	/*Chargement des données d'apreès le fichier*/
+	shiny_reader( argv[1], &donprob);
+	
+	crono_start(); /* Lancement du compteur*/
 
 	nbvar = donprob.n*donprob.n;
-	nbcont = 2*donprob.n;
+	nbcontr = 2*donprob.n;
 	nbcreux = 2*donprob.n*donprob.n;
-	printf("nbvar=%d, nbcont=%d, nbcreux=%d \n", nbvar, nbcont, nbcreux);
+	printf("nbvar=%d, nbcontr=%d, nbcreux=%d \n", nbvar, nbcontr, nbcreux);
 
 	prob = glp_create_prob(); /*Allocation mémoire pour le problème*/
 	glp_set_prob_name(prob, "trajet"); /* affectation d'un nom */
@@ -155,11 +195,11 @@ int main( int argc, char **argv )
 
 	
 	/* Déclaration du nombre de contraintes (nombre de lignes de la matrice des contraintes) */
-	glp_add_rows(prob, nbcont); 
+	glp_add_rows(prob, nbcontr); 
 
 
 	/* Bornes sur les contraintes */
-	for(i=1;i<=nbcont;i++)
+	for(i=1;i<=nbcontr;i++)
 	{
 		glp_set_row_bnds(prob, i, GLP_FX, 1.0, 1.0); 
 	}
@@ -217,6 +257,7 @@ int main( int argc, char **argv )
 	///glp_write_lp(prob,NULL,"trajet.lp");
 
 	/* Résolution, puis lecture des résultats */
+	nbsol++;
 	glp_simplex(prob,&parm);
 	glp_intopt(prob,&parmip); /* Résolution */
 	
@@ -248,7 +289,7 @@ int main( int argc, char **argv )
 	
 	while(long_plus_petit_cycle < donprob.n)
 	{
-		nbcont++; 
+		nbcontr++; 
 		nbcreux += long_plus_petit_cycle;
 		
 		
@@ -260,7 +301,7 @@ int main( int argc, char **argv )
 
 
 		/* Bornes sur la nouvelle contrainte pour casser le cycle */
-		glp_set_row_bnds(prob, nbcont, GLP_UP, long_plus_petit_cycle-1.0, long_plus_petit_cycle-1.0); 
+		glp_set_row_bnds(prob, nbcontr, GLP_UP, long_plus_petit_cycle-1.0, long_plus_petit_cycle-1.0); 
 		
 		// ****realloc
 		/* allocation */
@@ -271,14 +312,14 @@ int main( int argc, char **argv )
 			
 		/* Remplissage matrice contrainte */
 		/* Transition fin/début du cycle */
-		ia[pos] = nbcont;
+		ia[pos] = nbcontr;
 		ja[pos] = ((tab_cycle[long_plus_petit_cycle-1])*donprob.n)+tab_cycle[0]+1;
 		ar[pos] = 1.0;
 		pos++;
 			
 		/* Autres transitions */
 		for(i=0;i<long_plus_petit_cycle-1;i++){
-			ia[pos] = nbcont;
+			ia[pos] = nbcontr;
 			ja[pos] = (tab_cycle[i]*donprob.n)+tab_cycle[i+1]+1;
 			ar[pos] = 1.0;
 			pos++;
@@ -299,6 +340,7 @@ int main( int argc, char **argv )
 		///glp_write_lp(prob,NULL,"trajet.lp");
 
 		/* Résolution, puis lecture des résultats */
+		nbsol++;
 		glp_simplex(prob,&parm);
 		glp_intopt(prob,&parmip); /* Résolution */
 	
@@ -325,6 +367,10 @@ int main( int argc, char **argv )
 		// recalcul pluspetitcycle
 		long_plus_petit_cycle = plus_petit_cycle(xcast, donprob.n, tab_cycle );
 	}
+	
+	/* Résolution achevée, arrêt du compteur de temps et affichage des résultats */
+	crono_stop();
+	temps = crono_ms()/1000,0;
 
 	// Affichage de la solution
 	printf("z = %lf\n",z);
@@ -342,6 +388,10 @@ int main( int argc, char **argv )
 		depart = (destination % donprob.n) * donprob.n;
 	}
 	puts(" ");
+	
+	printf("Temps : %f\n",temps);	
+	printf("Nombre d'appels à GPLK : %d\n",nbsol);
+	printf("Nombre de contraintes ajoutées : %d\n",nbcontr);
 
 	/* libération mémoire */
 	glp_delete_prob(prob);
