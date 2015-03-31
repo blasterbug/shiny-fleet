@@ -179,7 +179,7 @@ int main( int argc, char **argv )
 
 	nbvar = donprob.n*donprob.n;
 	nbcontr = 2*donprob.n;
-	nbcreux = 2*donprob.n*donprob.n;
+	nbcreux = (2*donprob.n*donprob.n)-2*donprob.n;
 	printf("nbvar=%d, nbcontr=%d, nbcreux=%d \n", nbvar, nbcontr, nbcreux);
 
 	prob = glp_create_prob(); /*Allocation mémoire pour le problème*/
@@ -229,17 +229,19 @@ int main( int argc, char **argv )
 
 	for(i=1; i<=donprob.n; i++){
 		for (j=1; j<=donprob.n; j++){
-			/*Contraintes (1)*/
-			ia[pos] = i;
-			ja[pos] = j+(i-1)*donprob.n;
-			ar[pos] = 1.0;
-			pos++;
+			if(i!=j){
+				/*Contraintes (1)*/
+				ia[pos] = i;
+				ja[pos] = j+(i-1)*donprob.n;
+				ar[pos] = 1.0;
+				pos++;
 
-			/*Contraintes (2)*/
-			ia[pos] = j+donprob.n;
-			ja[pos] = j+(i-1)*donprob.n;
-			ar[pos] = 1.0;
-			pos++;
+				/*Contraintes (2)*/
+				ia[pos] = j+donprob.n;
+				ja[pos] = j+(i-1)*donprob.n;
+				ar[pos] = 1.0;
+				pos++;
+			}
 		}
 	}
 	
@@ -391,7 +393,7 @@ int main( int argc, char **argv )
 	
 	printf("Temps : %f\n",temps);	
 	printf("Nombre d'appels à GPLK : %d\n",nbsol);
-	printf("Nombre de contraintes ajoutées : %d\n",nbcontr);
+	printf("Nombre de contraintes ajoutées : %d (%d contraintes de base)\n",nbcontr, 2*donprob.n);
 
 	/* libération mémoire */
 	glp_delete_prob(prob);
