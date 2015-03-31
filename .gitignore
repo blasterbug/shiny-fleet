@@ -31,3 +31,10 @@
 #Temporary
 *~
 *.lp
+.DS_Store
+
+# LaTeX files
+*.aux
+*.log
+*.synctex.gz
+*.toc
