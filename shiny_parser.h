@@ -5,8 +5,8 @@
  ** Shiny fleet
  ** Lecture des données pour le projet
  **/
-#ifndef parser
-#define parser
+#ifndef PARSER
+#define PARSER
 
 #include <stdio.h>
 #include <stdlib.h>

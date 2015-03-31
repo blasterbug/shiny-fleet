@@ -5,9 +5,12 @@
  ** Shiny fleet
  ** Détection du plus-petit sous-cycle d'un ensemble de variables
  **/
+
+#ifndef SOUSCYCLES
+#define SOUSCYCLES
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 /**
  * Trouve le plus petit cycle après résolution
@@ -98,3 +101,5 @@ int plus_petit_cycle( const int* valeursvar, const int nbdest, int* boucle_min )
 	
 	return boucle_min_long;
 }
+#endif
+/** fin du fichier **/
