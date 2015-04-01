@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,12pt]{article}
 \usepackage[utf8]{inputenc}
 %\usepackage{fullpage}
 \usepackage[frenchb]{babel}
@@ -22,29 +22,150 @@
 
 \maketitle
 
-% sommaire sur une nouvelle page
-\newpage
-\tableofcontents
+\section*{Introduction}
 
 \paragraph{}{
-	Paragraphe d'introduction
+    La recherche opérationnelle est un champ de recherche de méthodes pour prendre des décisions optimales à des problèmes d'organisation. Dans ce projet, nous avons étudié une instance du problème du voyageur de commerce connu comme étant un problème \textit{NP-complet}. Il consiste à chercher le trajet le plus court passant par différents lieux en connaissant toutes les distances entre ces lieux. Ce problème peut être modélisé sous forme d'un graphe où les sommets sont les lieux et les arcs sont pondérés par la distance entre chaque lieu. }
+\paragraph{}{
+	Nous avons pour ce projet, déjà modélisé dans le sujet, utilisé la bibliothèque C du solveur GLPK. Celui-ci permet de trouver une solution optimale à un problème dont on spécifie les contraintes, la fonction objectif et les variables souhaitées.
+}
+
+\paragraph{Utilisation}{
+    Pour compiler notre programme, en supposant qu'on utilise un système de type \textsc{Unix}, faites les commande suivantes:
+    \begin{verbatim}
+    $ cd <dossier du projet>
+    $ gcc -o resol projet_Delalande_D_Sientzoff.c -lglpk -lm
+    $ ./resol plat/plat10.dat
+    \end{verbatim}
+    Ici, pour obtenir la solution au problème correspondant aux données du fichier \textit{plat10.dat}.
 }
 
 \section{Preuve} % trouver un meilleur titre
 
-\paragraph{Affirmation}{
-	Nous avons donc ici obtenu une solution admissible et optimale pour cette instance du problème de voyageur de commerce en ne considérant que deux contraintes de l’ensemble (3 ′ ).
+\paragraph{}{
+    Rappelons les contraintes du problème.
 }
-
-\begin{equation}
-	\sum_{i,j= \in S} x_{ij} \leq |S| \less 1 , avec \forall S 2 \leq |S| \leq n \less 1
-\end{equation}
-
-
-\newpage
+\[
+\begin{array}{r c l l}
+  \sum_{i=1,\ i\neq j}^{n} x_{i,j} & =  & 1 , \forall i \in \{1,...,n\} & (1') \\
+  \sum_{j=1,\ i\neq j}^{n} x_{i,j} & = & 1 , \forall j \in \{1,...,n\} & (2') \\
+  \sum_{i,j \in S} x_{i,j} & \leq & |S| - 1 , \forall S, 2 \leq |S| \leq n - 1 & (3') \\
+\end{array}
+\]
 
 \paragraph{}{
-	Paragraphe de conclusion
+    Les contraintes $(1')$ et $(2')$ obligent le solveur à ne choisir un somment qu'une et une seule fois comme point d'arrivée ou de départ dans un cycle, on ne visite alors qu'une seule fois un point. La contrainte $(3')$ assure la taille du cycle optimal à chercher, on veut visiter tous les sommets avec un seul cycle. 
+}
+
+\subparagraph{}{}paragraph{Affirmation}{
+	Nous avons donc ici obtenu une solution admissible et optimale pour cette instance du problème de voyageur de commerce en ne considérant que deux contraintes de l’ensemble (3).
+}
+
+\paragraph{}{
+    Une solution est optimale dès qu'elle n'est composée que d'un seul cycle. En effet, l'absence de sous-cycles nous assure qu'on va alors visiter tous les points de façon consécutive. Les deux premières contraintes nous assurant que vous ne passerons jamais deux fois par le même sommet. 
+}
+
+\section{Indices de variables et valeurs du problème}
+
+\paragraph{}{
+    Dans le problème, on dispose d'une variable $x_{ij}$ pour indiquer si le robot se rend du lieu $i$ au lieu $j$, ce qui donne au total $2^n$ variables pour $n$ lieux à visiter. Ces variables ont deux indices, ce qu'on ne peut faire avec GLPK. On crée donc $nbvar = n^2$ variables $x_k$ d'indices $k = i \times n + j$ pour tout $i,j$ compris entre $1$ et $n$.
+}
+
+\paragraph{}{
+    Pour chaque lieu, on a une contrainte spécifiant qu'on ne peut avoir qu'un seul chemin y arrivant $(1)$ et qu'un seul chemin en partant $(2)$. On a donc au départ $nbcontr=2 \times n$ contraintes. On ne spécifie pas au départ toutes les contraintes relatives pour ne pas avoir de sous-cycles $(3)$ car elles seraient trop nombreuses.\newline
+    La spécificité de notre problème va être de répéter la résolution tant que l'on trouve un sous-cycle dans la solution donnée par GLPK après avoir rajouté la contrainte pour empêcher ce sous-cycle. 
+}
+
+\paragraph{}{
+    On crée aussi les variables nécessaires à la résolution de GLPK et plus particulièrement de la matrice de contrainte que l'on représente sous forme de matrice creuse avec trois tableaux. Pour allouer dynamiquement la taille de ces tableaux ne contenant que les éléments non-nuls, on doit connaître le nombre d'éléments.
+    La matrice définit une contrainte sur chaque ligne et quelles variables y sont concernées. On a donc $(2 \times n)$ contraintes contenant $(n-1)$ éléments soit $nbcreux = (2 \times n^2)-2*n$ éléments non-nuls dans notre matrice.
+}
+
+\section{Fonctionnement et structure du programme}
+
+\paragraph{}{
+    Le problème ici posé est de type \textit{Voyageur de commerces}. En effet, on cherche un cycle optimal permettant de visiter un ensemble de points d'intérêts. Pour résoudre ce problème avec GLPK, on va lui demander de une résolution le problème avec un ensemble minimal de contraintes pour obtenir un réponse rapidement. On va ensuite se demander si la solution est optimale. Une solution est optimale si il n'y a pas de sous-cycles. Si il y a des sous-cycles, on ajoute la contrainte permettant de casser ce sous-cycle et on relance la résolution du problème. On procède ainsi de suite jusqu'à obtenir une solution avec un seul cycle.
+}
+
+\paragraph{Lecture des résultats}{
+    Lorsqu'on lance le solveur, GLPK nous retourne sa solution optimale sous forme d'un tableau contenant les l'ensemble des valeurs de nos variables binaires pour la solution optimale. Par exemple, pour un problème de taille $n$, on obtient un tableau avec les valeurs de nos $n^2$ variables, chacune représentant donc si l'on emprunte le trajet $i \rightarrow j$ dans notre solution. On représente ici pour plus de lisibilité notre tableau sous forme d'une matrice de hauteur et longueur $n$
+    
+\[
+\begin{pmatrix}
+   0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0  \\
+   0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0  \\
+   0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1  \\
+   0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0  \\
+   0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0  \\
+   0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0  \\
+   0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0  \\
+   1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+   0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
+\end{pmatrix}
+\]
+    
+    Pour chaque "ligne" de notre matrice correspondant à un lieu, on va chercher la valeur non-nulle qui va donc indiquer son successeur et que l'on va enregistrer dans un tableau. Par exemple sur la ligne 0, c'est la colonne 2 qui est non-nulle, 0 a donc pour successeur 2, etc. Cela nous donne ce tableau :
+    
+\[
+\begin{array}{c c c c c c c c c c}
+    0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\
+    \downarrow & \downarrow & \downarrow & \downarrow & \downarrow & \downarrow & \downarrow & \downarrow & \downarrow & \downarrow \\
+    2 & 8 & 4 & 9 & 7 & 3 & 5 & 6 & 0 & 1 \\
+\end{array}
+\]
+    On effectue ensuite une lecture de ce tableau pour parcourir les indices et joindre les successeurs bout à bout, nous donnant le chemin complet de la solution optimale.
+    
+\begin{verbatim}
+0 -> 2 -> 4 -> 7 -> 6 -> 5 -> 3 -> 9 -> 1 -> 8 -> 
+\end{verbatim}
+}
+
+
+\section{Résultats}
+
+%tableau de résultats
+
+\begin{figure}[!ht]
+    \centering
+    \begin{tabular}{ | p{3cm} | p{1cm} | p{2cm} | p{2cm} | p{3cm} | }
+    	\hline \textbf{Données} & \textbf{z} & \textbf{Temps (s)} & \textbf{Appels GLPK} & \textbf{Contraintes ajoutées} \\ 
+    	\hline Plat10 & 170 & 0.00 & 3 & 2 \\
+    	\hline Plat30 & 148 & 0.08 & 15 & 14\\
+    	\hline Plat50 & 207 & 0.358 & 24 & 23\\
+    	\hline Plat70 & 160 & 34.493 & 50 & 49\\
+    	\hline Plat90 & 157 & 17.174 & 42 & 41\\
+    	\hline Plat110 & 152 & 42.544 & 45 & 44\\
+    	\hline Plat130 & 112 & 196.289 & 67 & 66\\
+    	\hline Plat150 & 146 & 527.639 & 72 & 71\\
+    	\hline
+    	\hline Relief10 & 198 & 0.00 & 3 & 2\\
+    	\hline Relief30 & 116 & 0.05 & 1 & 0\\
+    	\hline Relief50 & 155 & 0.505 & 9 & 8\\
+    	\hline Relief70 & 115 & 0.283 & 6 & 5\\
+    	\hline Relief90 & 118 & 1.645 & 7 & 6\\
+    	\hline Relief110 & 113 & 1.981 & 5 & 4\\
+    	\hline Relief130 & 107 & 0.639 & 3 & 2\\
+    	\hline Relief150 & 100 & 2.941 & 11 & 10\\
+    	\hline
+    \end{tabular} 
+\caption{Résultats partiels d'exécution de notre programme sur le jeu de données}
+\label{planning}
+\end{figure}
+
+\paragraph{Interprétation}{
+    On voit que les résultats\footnote{Résultats complets sont disponibles dans le fichier \textit{benchmark.md}} sont très dépendants des données à résoudre : le temps de résolution et le nombre d'appels à GLPK sont proportionnels au nombre de cycles à casser, ceux-ci n'évoluant pas strictement de manière croissante à notre nombre de destinations (Plat90 est ainsi plus rapide à résoudre que Plat70).\newline
+    On remarque en revanche que les données Relief sont exécutées plus facilement et ont moins de cycles à casser, cela s'explique par le fait qu'avec ces données, GLPK a moins de chances de sélectionner au début des courts chemins qui forment des cycles.
+}
+
+\section*{Conclusion}
+
+\paragraph{}{
+	Notre programme renvoie à priori le plus court chemin d'une instance donnée du problème. Nos contraintes et notre fonction objectif ont été correctement définis et la solution obtenue vérifie nos contraintes. En vertu de la preuve donnée plus haut, on obtient donc bien la solution optimale selon GLPK.
+}
+
+\paragraph{}{
+    Ce projet pourrait être amélioré sur plusieurs points. En particulier, la gestion dynamique de la mémoire qui n'est pas optimisée. Cela passerait par une meilleure façon de faire nos allocations mémoire et la façon dont on libère cette dernière. En effet notre utilisation de la fonction \verb|realloc| n'est certainement pas la meilleur, on crée alors de la fragmentation de la mémoire. Notons tout de même, que l'utilisation du langage C et non du C++, est le meilleur choix. En effet, le C++ est un langage orientée objet, l'allocation et la désallocation d'objets en mémoire est moins efficace que les structures utilisées en C.
 }
 
 
@@ -60,3 +181,17 @@ de cycles disjoints,
 ajoutées pour résoudre le problème...). On considérera séparément les instances de la catégorie plat et
 relief. Lesquelles sont les plus difficiles à résoudre avec l’algorithme proposé, pourquoi ?
 – Éventuellement, des améliorations pourront être proposées suite à cette analyse expérimentale.
+
+% exemple pour faire une matrice (ça marche un peu comme un tableau)
+\[
+\begin{pmatrix}
+   a_1 & b_1 \\
+   a_2 & b_2 
+\end{pmatrix}
+\]
+
+Pour les ellipses, on dispose des symboles suivants:
+\cdots 	points centrés
+\ldots 	points sur la ligne
+\vdots  ... vertical
+\ddots  ... (en diagonal)
