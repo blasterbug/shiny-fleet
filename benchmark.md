@@ -1,4 +1,41 @@
-### plat10.dat
+[plat](#plat)
+  + [plat10](#plat10)
+  + [plat20](#plat20)
+  + [plat30](#plat30)
+  + [plat40](#plat40)
+  + [plat50](#plat50)
+  + [plat60](#plat60)
+  + [plat70](#plat70)
+  + [plat80](#plat80)
+  + [plat90](#plat90)
+  + [plat100](#plat100)
+  + [plat110](#plat110)
+  + [plat120](#plat120)
+  + [plat130](#plat130)
+  + [plat140](#plat140)
+  + [plat150](#plat150)
+
+[relief](#relief)
+  + [relief10](#relief10)
+  + [relief20](#relief20)
+  + [relief30](#relief30)
+  + [relief40](#relief40)
+  + [relief50](#relief50)
+  + [relief60](#relief60)
+  + [relief70](#relief70)
+  + [relief80](#relief80)
+  + [relief90](#relief90)
+  + [relief100](#relief100)
+  + [relief110](#relief110)
+  + [relief120](#relief120)
+  + [relief130](#relief130)
+  + [relief140](#relief140)
+  + [relief150](#relief150)
+
+
+<h2 id="plat"> plat </h2>
+
+<h3 id="plat10"> plat10.dat </h3>
 
 	nbvar=100, nbcontr=20, nbcreux=180 
 	z = 170.000000
@@ -9,7 +46,7 @@
 	Nombre d'appels à GPLK : 3
 	Nombre de contraintes ajoutées : 22 (20 contraintes de base)
 
-### plat20.dat
+<h3 id="plat20"> plat20.dat </h3>
 
 	nbvar=400, nbcontr=40, nbcreux=760 
 	z = 200.000000
@@ -20,7 +57,7 @@
 	Nombre d'appels à GPLK : 12
 	Nombre de contraintes ajoutées : 51 (40 contraintes de base)
 
-### plat30.dat
+<h3 id="plat30"> plat30.dat </h3>
 
 	nbvar=900, nbcontr=60, nbcreux=1740 
 	z = 148.000000
@@ -31,7 +68,7 @@
 	Nombre d'appels à GPLK : 15
 	Nombre de contraintes ajoutées : 74 (60 contraintes de base)
 
-### plat40.dat
+<h3 id="plat40"> plat40.dat </h3>
 
 	nbvar=1600, nbcontr=80, nbcreux=3120 
 	z = 192.000000
@@ -42,7 +79,7 @@
 	Nombre d'appels à GPLK : 21
 	Nombre de contraintes ajoutées : 100 (80 contraintes de base)
 
-### plat50.dat
+<h3 id="plat50"> plat50.dat </h3>
 
 	nbvar=2500, nbcontr=100, nbcreux=4900 
 	z = 207.000000
@@ -53,7 +90,7 @@
 	Nombre d'appels à GPLK : 24
 	Nombre de contraintes ajoutées : 123 (100 contraintes de base)
 
-### plat60.dat
+<h3 id="plat60"> plat60.dat </h3>
 
 	nbvar=3600, nbcontr=120, nbcreux=7080 
 	z = 134.000000
@@ -64,7 +101,7 @@
 	Nombre d'appels à GPLK : 28
 	Nombre de contraintes ajoutées : 147 (120 contraintes de base)
 
-### plat70.dat
+<h3 id="plat70"> plat70.dat </h3>
 
 	nbvar=4900, nbcontr=140, nbcreux=9660 
 	z = 160.000000
@@ -75,7 +112,7 @@
 	Nombre d'appels à GPLK : 50
 	Nombre de contraintes ajoutées : 189 (140 contraintes de base)
 
-### plat80.dat
+<h3 id="plat80"> plat80.dat </h3>
 
 	nbvar=6400, nbcontr=160, nbcreux=12640 
 	z = 183.000000
@@ -86,7 +123,7 @@
 	Nombre d'appels à GPLK : 39
 	Nombre de contraintes ajoutées : 198 (160 contraintes de base)
 
-### plat90.dat
+<h3 id="plat90"> plat90.dat </h3>
 
 	nbvar=8100, nbcontr=180, nbcreux=16020 
 	z = 157.000000
@@ -97,9 +134,116 @@
 	Nombre d'appels à GPLK : 42
 	Nombre de contraintes ajoutées : 221 (180 contraintes de base)
 
-### plat100.dat
+<h3 id="plat100"> plat100.dat </h3>
+
+	nbvar=10000, nbcontr=200, nbcreux=19800 
+	z = 173.000000
+
+	 Itinéraire calculé :
+	0 -> 2 -> 95 -> 51 -> 10 -> 65 -> 28 -> 98 -> 86 -> 96 -> 9 -> 3 -> 32 -> 40 -> 30 -> 8 -> 88 -> 89 -> 97 -> 58 -> 67 -> 44 -> 14 -> 33 -> 49 -> 31 -> 16 -> 43 -> 42 -> 35 -> 29 -> 79 -> 47 -> 70 -> 38 -> 36 -> 87 -> 41 -> 20 -> 11 -> 74 -> 4 -> 91 -> 63 -> 34 -> 46 -> 56 -> 18 -> 69 -> 81 -> 27 -> 75 -> 7 -> 15 -> 17 -> 26 -> 90 -> 78 -> 92 -> 94 -> 73 -> 68 -> 76 -> 80 -> 19 -> 50 -> 82 -> 39 -> 85 -> 71 -> 22 -> 77 -> 64 -> 1 -> 99 -> 84 -> 59 -> 37 -> 62 -> 57 -> 21 -> 5 -> 83 -> 13 -> 66 -> 93 -> 52 -> 55 -> 48 -> 61 -> 53 -> 25 -> 6 -> 60 -> 54 -> 12 -> 23 -> 72 -> 24 -> 45 ->  
+	Temps : 161.737000
+	Nombre d'appels à GPLK : 55
+	Nombre de contraintes ajoutées : 254 (200 contraintes de base)
+
+<h3 id="plat110"> plat110.dat </h3>
+
+	nbvar=12100, nbcontr=220, nbcreux=23980 
+	z = 152.000000
+
+	 Itinéraire calculé :
+	0 -> 70 -> 82 -> 68 -> 38 -> 107 -> 76 -> 1 -> 109 -> 49 -> 79 -> 92 -> 41 -> 83 -> 53 -> 13 -> 8 -> 54 -> 14 -> 36 -> 48 -> 42 -> 25 -> 24 -> 86 -> 50 -> 31 -> 63 -> 11 -> 91 -> 28 -> 27 -> 44 -> 61 -> 84 -> 77 -> 18 -> 29 -> 99 -> 55 -> 65 -> 7 -> 12 -> 47 -> 64 -> 87 -> 69 -> 45 -> 2 -> 34 -> 59 -> 57 -> 51 -> 89 -> 58 -> 22 -> 96 -> 37 -> 23 -> 80 -> 32 -> 102 -> 85 -> 30 -> 52 -> 19 -> 3 -> 21 -> 105 -> 78 -> 4 -> 20 -> 94 -> 62 -> 71 -> 106 -> 66 -> 90 -> 88 -> 15 -> 74 -> 33 -> 35 -> 43 -> 73 -> 17 -> 39 -> 60 -> 10 -> 46 -> 9 -> 72 -> 75 -> 16 -> 97 -> 56 -> 26 -> 108 -> 98 -> 67 -> 100 -> 104 -> 95 -> 81 -> 103 -> 6 -> 93 -> 5 -> 40 -> 101 ->  
+	Temps : 42.544000
+	Nombre d'appels à GPLK : 45
+	Nombre de contraintes ajoutées : 264 (220 contraintes de base)
+
+<h3 id="plat120"> plat120.dat </h3>
+
+	nbvar=14400, nbcontr=240, nbcreux=28560 
+	z = 138.000000
+
+	 Itinéraire calculé :
+	0 -> 28 -> 98 -> 36 -> 73 -> 68 -> 26 -> 95 -> 116 -> 5 -> 101 -> 14 -> 91 -> 111 -> 51 -> 118 -> 15 -> 96 -> 45 -> 7 -> 63 -> 20 -> 21 -> 30 -> 53 -> 37 -> 55 -> 89 -> 78 -> 56 -> 11 -> 87 -> 67 -> 4 -> 90 -> 59 -> 88 -> 57 -> 76 -> 94 -> 82 -> 32 -> 40 -> 64 -> 19 -> 2 -> 46 -> 34 -> 102 -> 38 -> 39 -> 79 -> 58 -> 109 -> 22 -> 81 -> 48 -> 113 -> 24 -> 13 -> 107 -> 85 -> 49 -> 99 -> 8 -> 119 -> 110 -> 80 -> 23 -> 54 -> 92 -> 42 -> 41 -> 71 -> 108 -> 106 -> 25 -> 47 -> 100 -> 18 -> 115 -> 17 -> 12 -> 112 -> 72 -> 75 -> 9 -> 105 -> 3 -> 60 -> 83 -> 61 -> 6 -> 97 -> 86 -> 33 -> 93 -> 35 -> 44 -> 10 -> 27 -> 50 -> 74 -> 104 -> 65 -> 16 -> 69 -> 114 -> 62 -> 70 -> 29 -> 84 -> 52 -> 117 -> 66 -> 103 -> 1 -> 77 -> 43 -> 31 ->  
+	Temps : 148.645000
+	Nombre d'appels à GPLK : 60
+	Nombre de contraintes ajoutées : 299 (240 contraintes de base)
+
+<h3 id="plat130"> plat130.dat </h3>
+
+	nbvar=16900, nbcontr=260, nbcreux=33540 
+	z = 112.000000
+
+	 Itinéraire calculé :
+	0 -> 29 -> 81 -> 110 -> 2 -> 70 -> 50 -> 41 -> 67 -> 92 -> 97 -> 88 -> 47 -> 56 -> 30 -> 4 -> 129 -> 12 -> 35 -> 32 -> 19 -> 28 -> 108 -> 46 -> 80 -> 22 -> 6 -> 20 -> 63 -> 78 -> 68 -> 111 -> 121 -> 96 -> 40 -> 120 -> 69 -> 73 -> 44 -> 127 -> 54 -> 43 -> 128 -> 125 -> 14 -> 100 -> 82 -> 57 -> 123 -> 9 -> 48 -> 23 -> 85 -> 27 -> 118 -> 64 -> 13 -> 5 -> 86 -> 114 -> 1 -> 117 -> 83 -> 25 -> 102 -> 7 -> 55 -> 87 -> 26 -> 8 -> 104 -> 58 -> 33 -> 109 -> 15 -> 107 -> 112 -> 95 -> 24 -> 36 -> 59 -> 99 -> 74 -> 51 -> 103 -> 76 -> 119 -> 116 -> 89 -> 98 -> 34 -> 18 -> 42 -> 126 -> 91 -> 65 -> 75 -> 52 -> 77 -> 101 -> 17 -> 115 -> 37 -> 72 -> 90 -> 60 -> 124 -> 79 -> 45 -> 71 -> 66 -> 93 -> 84 -> 113 -> 11 -> 49 -> 94 -> 3 -> 62 -> 105 -> 106 -> 31 -> 61 -> 16 -> 38 -> 21 -> 39 -> 122 -> 53 -> 10 ->  
+	Temps : 196.289000
+	Nombre d'appels à GPLK : 67
+	Nombre de contraintes ajoutées : 326 (260 contraintes de base)
+
+<h3 id="plat140"> plat140.dat </h3>
+
+	nbvar=19600, nbcontr=280, nbcreux=38920 
+	z = 141.000000
+
+	 Itinéraire calculé :
+	0 -> 29 -> 18 -> 138 -> 135 -> 80 -> 27 -> 127 -> 16 -> 45 -> 106 -> 132 -> 1 -> 2 -> 88 -> 28 -> 70 -> 77 -> 41 -> 117 -> 86 -> 119 -> 4 -> 47 -> 25 -> 33 -> 123 -> 34 -> 72 -> 109 -> 136 -> 23 -> 13 -> 3 -> 121 -> 118 -> 130 -> 73 -> 68 -> 43 -> 66 -> 60 -> 54 -> 46 -> 105 -> 89 -> 99 -> 82 -> 22 -> 31 -> 20 -> 63 -> 61 -> 51 -> 76 -> 122 -> 52 -> 114 -> 26 -> 74 -> 116 -> 103 -> 134 -> 59 -> 58 -> 56 -> 57 -> 64 -> 94 -> 131 -> 11 -> 87 -> 133 -> 83 -> 36 -> 92 -> 139 -> 8 -> 115 -> 84 -> 100 -> 91 -> 5 -> 65 -> 98 -> 107 -> 78 -> 50 -> 12 -> 48 -> 97 -> 35 -> 129 -> 113 -> 21 -> 42 -> 49 -> 53 -> 62 -> 128 -> 93 -> 96 -> 85 -> 69 -> 40 -> 125 -> 15 -> 95 -> 9 -> 102 -> 38 -> 6 -> 137 -> 126 -> 10 -> 108 -> 67 -> 75 -> 32 -> 90 -> 112 -> 14 -> 44 -> 81 -> 104 -> 124 -> 101 -> 30 -> 24 -> 55 -> 19 -> 71 -> 39 -> 37 -> 17 -> 79 -> 7 -> 120 -> 110 -> 111 ->  
+	Temps : 377.416000
+	Nombre d'appels à GPLK : 70
+	Nombre de contraintes ajoutées : 349 (280 contraintes de base)
+
+<h3 id="plat150"> plat150.dat </h3>
+
+	nbvar=22500, nbcontr=300, nbcreux=44700 
+	z = 146.000000
+
+	 Itinéraire calculé :
+	0 -> 59 -> 100 -> 56 -> 32 -> 35 -> 139 -> 84 -> 91 -> 142 -> 81 -> 120 -> 63 -> 70 -> 25 -> 27 -> 51 -> 21 -> 42 -> 116 -> 19 -> 1 -> 10 -> 65 -> 145 -> 53 -> 92 -> 67 -> 125 -> 38 -> 15 -> 147 -> 118 -> 83 -> 146 -> 113 -> 55 -> 114 -> 43 -> 133 -> 107 -> 134 -> 62 -> 33 -> 14 -> 49 -> 130 -> 108 -> 97 -> 129 -> 37 -> 136 -> 140 -> 137 -> 52 -> 5 -> 36 -> 64 -> 50 -> 41 -> 99 -> 18 -> 12 -> 80 -> 111 -> 126 -> 87 -> 85 -> 124 -> 3 -> 95 -> 13 -> 69 -> 123 -> 4 -> 29 -> 17 -> 77 -> 6 -> 61 -> 96 -> 26 -> 101 -> 127 -> 11 -> 106 -> 98 -> 34 -> 75 -> 119 -> 86 -> 68 -> 60 -> 48 -> 105 -> 22 -> 93 -> 135 -> 16 -> 89 -> 144 -> 30 -> 128 -> 88 -> 149 -> 131 -> 73 -> 40 -> 58 -> 76 -> 102 -> 82 -> 54 -> 148 -> 90 -> 74 -> 47 -> 66 -> 94 -> 8 -> 141 -> 7 -> 122 -> 39 -> 79 -> 138 -> 103 -> 72 -> 109 -> 143 -> 115 -> 132 -> 112 -> 23 -> 71 -> 31 -> 121 -> 57 -> 104 -> 44 -> 20 -> 117 -> 110 -> 78 -> 46 -> 28 -> 2 -> 9 -> 45 -> 24 ->  
+	Temps : 527.639000
+	Nombre d'appels à GPLK : 72
+	Nombre de contraintes ajoutées : 371 (300 contraintes de base)
 
 
+<h2 id="relief"> relief </h2>
+
+<h3 id="relief10"> relief10.dat </h3>
 
 
+<h3 id="relief20"> relief20.dat </h3>
+
+
+<h3 id="relief30"> relief30.dat </h3>
+
+
+<h3 id="relief40"> relief40.dat </h3>
+
+
+<h3 id="relief50"> relief50.dat </h3>
+
+
+<h3 id="relief60"> relief60.dat </h3>
+
+
+<h3 id="relief70"> relief70.dat </h3>
+
+
+<h3 id="relief80"> relief80.dat </h3>
+
+
+<h3 id="relief90"> relief90.dat </h3>
+
+
+<h3 id="relief100"> relief100.dat </h3>
+
+
+<h3 id="relief110"> relief110.dat </h3>
+
+
+<h3 id="relief120"> relief120.dat </h3>
+
+
+<h3 id="relief130"> relief130.dat </h3>
+
+
+<h3 id="relief140"> relief140.dat </h3>
+
+
+<h3 id="relief150"> relief150.dat </h3>
 
